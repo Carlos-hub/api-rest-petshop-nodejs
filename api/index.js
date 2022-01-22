@@ -1,12 +1,11 @@
- const express = require('express')
- const app = express()
- const bodyParser = require('body-parser')
- const config = require('config')
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
+const config = require('config')
 
- app.use(bodyParser.json())
+app.use(bodyParser.json())
 
-//  Crianto rota GET
- app.use('/api/fornecedores',(req,res) =>{
+const roteador = require('./rotas/fornecedores')
+app.use('/api/fornecedores', roteador)
 
- })
- app.listen(config.get('api.porta'), () => console.log('A API está funcionando'))
+app.listen(config.get('api.porta'), () => console.log('A API está funcionando!'))
