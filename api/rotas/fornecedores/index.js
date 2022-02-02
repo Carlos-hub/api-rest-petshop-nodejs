@@ -8,7 +8,7 @@ roteador.get('/', async (requisicao,resposta) =>{
         JSON.stringify(resultados)
     )
 })
-roteador.post('/', async (requisicao,resposta) =>{
+roteador.post('/', async (requisicao,resposta, proximo) =>{
    try{
     const dadosRecebidos = requisicao.body
     const fornecedor = new Fornecedor(dadosRecebidos)
@@ -17,14 +17,10 @@ roteador.post('/', async (requisicao,resposta) =>{
         JSON.stringify(fornecedor)
     )
    }catch(erro){
-       resposta.status(400).send(
-           JSON.stringify({
-               messagem: erro.message
-           })
-       )
+    proximo(erro)
    }
 })
-roteador.get('/:idFornecedor', async (requisicao,resposta) => {
+roteador.get('/:idFornecedor', async (requisicao,resposta, proximo) => {
 
     try{
         const id = requisicao.params.idFornecedor
@@ -34,45 +30,32 @@ roteador.get('/:idFornecedor', async (requisicao,resposta) => {
             JSON.stringify(fornecedor)
         )
     }catch(erro){
-        next(erro)
-        resposta.status(400).send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
-roteador.put('/:idFornecedor', async (requisicao,resposta) =>{
+roteador.put('/:idFornecedor', async (requisicao,resposta, proximo) =>{
     try{ 
     const id = requisicao.params.idFornecedor
      const dadosRecebidos = requisicao.body
      const dados = Object.assign({}, dadosRecebidos,{id: id})
      const fornecedor = new Fornecedor(dados)
      await fornecedor.atualizar()
-
+     resposta.status(204)
      resposta.end()
     }catch(erro){
-        resposta.status(400).send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
-roteador.delete('/:idFornecedor', async(requisicao,resposta) =>{
+roteador.delete('/:idFornecedor', async(requisicao,resposta,proximo) =>{
 
     try{
         const id = requisicao.params.idFornecedor
         const fornecedor = new Fornecedor({id: id})
         await fornecedor.carregar()
         await fornecedor.remover()
-        resposta.end()
+        resposta.status(204).end()
     }catch(erro){
-        resposta.status(400).send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
 
