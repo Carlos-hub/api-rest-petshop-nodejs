@@ -1,13 +1,29 @@
-const CampoInvalido = require('./erros/CampoInvalido')
-const NaoEncontrado = require('./erros/NaoEncontrado')
-const ValorNaoSuportado = require('./erros/ValorNaoSuportado')
-const DadosNaoFornecidos = require('./erros/DadosNaoFornecidos')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const config = require('config')
+const CampoInvalido = require('./erros/CampoInvalido')
+const NaoEncontrado = require('./erros/NaoEncontrado')
+const ValorNaoSuportado = require('./erros/ValorNaoSuportado')
+const DadosNaoFornecidos = require('./erros/DadosNaoFornecidos')
+const formatosAceitos = require('./Serializador').formatosAceitos
 
 app.use(bodyParser.json())
+
+app.use((requisicao,resposta, proximo) =>{
+    let formatoRequisitado = requisicao.header('Accept')
+
+    if(formatoRequisitado === '*/*'){
+        formatoRequisitado = 'application/json'
+    }
+    if(formatosAceitos.indexOf(formatoRequisitado) === -1){
+        resposta.status(406)
+        return resposta.end()
+        
+    }
+    resposta.setHeader('Content-Type', formatoRequisitado)
+    proximo()
+})
 
 const roteador = require('./rotas/fornecedores')
 app.use('/api/fornecedores', roteador)
