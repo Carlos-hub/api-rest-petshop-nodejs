@@ -7,6 +7,7 @@ const NaoEncontrado = require('./erros/NaoEncontrado')
 const ValorNaoSuportado = require('./erros/ValorNaoSuportado')
 const DadosNaoFornecidos = require('./erros/DadosNaoFornecidos')
 const formatosAceitos = require('./Serializador').formatosAceitos
+const SerializadorErro = require('./Serializador').SerializadorErro
 
 app.use(bodyParser.json())
 
@@ -37,9 +38,12 @@ app.use((erro,requisicao, resposta, proximo) =>{
     }if(erro instanceof ValorNaoSuportado){
         status = 406
     }
+    const serializador = new SerializadorErro (
+        resposta.getHeader('Content-Type')
+    )
     resposta.status(status)
     resposta.send(
-        JSON.stringify({
+       serializador.serializar({
             mensagem: erro.message,
             id: erro.idErro
         })
